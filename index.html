@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Encryptor & Decryptor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            overflow-y: auto;
+            border-right: 3px solid #fff;
+        }
+
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+        }
+
+        /* About Section Styling */
+        .about-section {
+            margin-top: 30px;
+        }
+
+        .about-section h3,
+        .about-section p {
+            color: white;
+        }
+
+        .chatbot-container {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 300px;
+            height: 400px;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            background-color: white;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chatbot-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .chatbot-messages {
+            height: 280px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+        }
+
+        .chatbot-input-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chatbot-input {
+            width: 80%;
+            border-radius: 5px;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .chatbot-send-btn, .chatbot-clear-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chatbot-send-btn:hover, .chatbot-clear-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .chatbot-clear-btn {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        /* Adjustments for preventing overlap with the decryption section */
+        .main-content {
+            margin-right: 350px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar (About Section) -->
+    <div class="sidebar">
+        <h2>About</h2>
+        <div class="about-section">
+            <h3>Team Members</h3>
+            <p>Himanshu Kumar Pal - 0002CD221024</p>
+            <p>Dhruv Kumar Dubey - 0002CD221018</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content main-content">
+        <h1>File Encryptor & Decryptor</h1>
+        <p>Encrypt and decrypt your files securely with a password.</p>
+
+        <!-- Encryption Section -->
+        <h3>Encrypt File</h3>
+        <form action="/encrypt" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input type="file" name="file" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Enter a password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Encrypt</button>
+            <button type="reset" class="btn btn-secondary">Clear</button>
+        </form>
+
+        <!-- Decryption Section -->
+        <h3>Decrypt File</h3>
+        <form action="/decrypt" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input type="file" name="file" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Enter the password" required>
+            </div>
+            <button type="submit" class="btn btn-success">Decrypt</button>
+            <button type="reset" class="btn btn-secondary">Clear</button>
+        </form>
+    </div>
+
+    <!-- Chatbot Container (Right side of the page) -->
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <h5>Chatbot Assistant</h5>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages"></div>
+        <div class="chatbot-input-container">
+            <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Ask something...">
+            <button id="chatbot-send" class="chatbot-send-btn">Send</button>
+        </div>
+        <button id="chatbot-clear" class="chatbot-clear-btn">Clear Chat</button>
+    </div>
+
+    <script>
+        // Chatbot Interaction
+        document.getElementById('chatbot-send').addEventListener('click', function () {
+            const input = document.getElementById('chatbot-input').value;
+            if (!input.trim()) return;
+
+            const messages = document.getElementById('chatbot-messages');
+            messages.innerHTML += `<div class="user">You: ${input}</div>`;
+
+            fetch('/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: input })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    messages.innerHTML += `<div class="bot">Bot: ${data.response}</div>`;
+                    messages.scrollTop = messages.scrollHeight;
+                });
+
+            document.getElementById('chatbot-input').value = '';
+        });
+
+        // Clear Chatbot conversation
+        document.getElementById('chatbot-clear').addEventListener('click', function () {
+            document.getElementById('chatbot-messages').innerHTML = '';
+        });
+    </script>
+</body>
+</html>
